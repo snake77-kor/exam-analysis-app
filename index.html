@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학교 시험 분석 및 변형문제 생성기</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1>학교 시험 분석기</h1>
+            <p style="color: var(--text-scnd);">시험지와 시험범위를 분석하여 출제 경향을 파악하고 변형 문제를 생성합니다.</p>
+        </header>
+
+        <section class="input-section">
+            <!-- Split Layout Container -->
+            <!-- 0. Home Selection Screen -->
+            <div id="home-selection" class="home-selection">
+                <div class="selection-card" data-target="analysis-input-section">
+                    <div class="card-icon">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                    </div>
+                    <h2>기출 분석 및 데이터 추출</h2>
+                    <p>기존 시험지 파일을 업로드하여 출제 경향과 범위를 분석합니다.</p>
+                </div>
+
+                <div class="selection-card" data-target="generation-input-section">
+                    <div class="card-icon">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h2>변형 문제 생성</h2>
+                    <p>분석된 데이터를 기반으로 새로운 시험 범위에서 맞춤형 문제를 생성합니다.</p>
+                </div>
+            </div>
+
+            <!-- 1. Analysis Input Screen -->
+            <div id="analysis-input-section" class="input-panel single-view" style="display: none;">
+                <button class="back-btn"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>
+                <h3 class="panel-title">
+                    <i class="fa-solid fa-magnifying-glass-chart"></i> 기출 분석 설정
+                </h3>
+
+                <!-- Sub Navigation Tabs -->
+                <div class="tabs sub-tabs"
+                    style="justify-content: center; margin-bottom: 2rem; border-bottom: 1px solid var(--border-color);">
+                    <button class="sub-tab-btn active" data-target="tab-paper-input">1. 기출 시험지 입력</button>
+                    <button class="sub-tab-btn" data-target="tab-scope-input">2. 시험 범위 입력</button>
+                </div>
+
+                <!-- Step 1: Exam Paper Input -->
+                <div id="tab-paper-input" class="sub-tab-content active">
+                    <div class="input-group">
+                        <div class="file-upload-wrapper">
+                            <label for="exam-paper-file" class="custom-file-btn">
+                                <i class="fa-solid fa-file-arrow-up"></i> 시험지 파일 업로드 (.md)
+                            </label>
+                            <input type="file" id="exam-paper-file" accept=".md,.txt">
+                        </div>
+                        <label for="exam-paper" style="margin-top:0.5rem; display:block; font-size:0.85rem">또는 텍스트 직접
+                            입력</label>
+                        <textarea id="exam-paper" placeholder="시험지 내용을 여기에 직접 붙여넣거나, 위 버튼을 눌러 파일을 업로드하세요..."></textarea>
+                    </div>
+
+                </div>
+
+                <!-- Step 2: Exam Scope Input -->
+                <div id="tab-scope-input" class="sub-tab-content" style="display: none;">
+                    <div class="input-group">
+                        <div class="file-upload-wrapper">
+                            <label for="exam-scope-file" class="custom-file-btn">
+                                <i class="fa-solid fa-folder-plus"></i> 기출 시험 범위 파일 (.md)
+                            </label>
+                            <input type="file" id="exam-scope-file" accept=".md,.txt" multiple>
+                        </div>
+
+                        <div id="scope-file-list" class="file-list-container"></div>
+
+                        <label for="exam-scope" style="margin-top:0.5rem; display:block; font-size:0.85rem">또는 텍스트 직접
+                            입력</label>
+                        <textarea id="exam-scope" placeholder="기존 시험의 출제 범위 텍스트를 입력하세요..."></textarea>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 2rem;">
+                        <button id="analyze-step-btn" class="analyze-btn">
+                            <i class="fa-solid fa-chart-pie"></i> 기출 문제 분석 실행
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Generation Input Screen -->
+            <div id="generation-input-section" class="input-panel single-view" style="display: none;">
+                <button class="back-btn"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>
+                <h3 class="panel-title">
+                    <i class="fa-solid fa-pen-to-square"></i> 2. 변형 문제 생성 설정
+                </h3>
+
+                <div class="card"
+                    style="background-color: rgba(99, 102, 241, 0.05); border-color: var(--primary-color); margin-bottom: 1.5rem; padding: 1rem;">
+                    <p style="color: var(--text-color); font-weight: 500; font-size: 0.9rem;">
+                        <i class="fa-solid fa-circle-info"
+                            style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+                        분석된 패턴을 적용하여 <strong>새로운 시험 범위</strong>에서 문제를 출제합니다.
+                    </p>
+                </div>
+
+                <div class="input-group">
+                    <div class="file-upload-wrapper">
+                        <label for="target-scope-file" class="custom-file-btn">
+                            <i class="fa-solid fa-folder-plus"></i> 신규 시험 범위 파일 추가 (.md)
+                        </label>
+                        <input type="file" id="target-scope-file" accept=".md,.txt" multiple>
+                    </div>
+                    <div id="target-file-list" class="file-list-container"></div>
+                    <label for="target-scope" style="margin-top:0.5rem; display:block; font-size:0.85rem">또는 텍스트 직접
+                        입력</label>
+                    <textarea id="target-scope" placeholder="변형 문제를 만들 새로운 지문/범위를 입력하세요..."></textarea>
+                </div>
+
+                <div style="text-align: center; margin-top: 2rem;">
+                    <button id="generate-step-btn" class="analyze-btn"
+                        style="background: linear-gradient(135deg, var(--primary-color), #818cf8);">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> 변형 문제 생성 실행
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="results-section" class="results-section">
+            <div class="tabs">
+                <button class="tab-btn active" data-tab="analysis">분석 리포트</button>
+                <button class="tab-btn" data-tab="variation">변형 문제</button>
+            </div>
+
+            <!-- Analysis Tab -->
+            <div id="analysis" class="tab-content active">
+                <div class="analysis-grid">
+                    <div class="card">
+                        <h2>시험 범위 출제 비중</h2>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>범위명</th>
+                                        <th>문항 수</th>
+                                        <th>비율</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="scope-table-body">
+                                    <!-- Populated by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>출제 비율 그래프</h3>
+                        <div class="chart-container">
+                            <canvas id="scopeChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h2>문항별 상세 분석</h2>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>번호</th>
+                                    <th>유형</th>
+                                    <th>지문 출처</th>
+                                    <th>변형 유무</th>
+                                </tr>
+                            </thead>
+                            <tbody id="questions-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="killer-section">
+                    <div class="card">
+                        <h2>킬러 문항 정밀 분석</h2>
+                        <div id="killer-analysis-content" class="highlight-box">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="strategy-section">
+                    <div class="card">
+                        <h2>시험 총평 & 고득점 전략</h2>
+                        <div id="strategy-content" class="highlight-box"
+                            style="border-left-color: var(--success-color); background-color: rgba(34, 197, 94, 0.1);">
+                            <!-- Populated by JS -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Variation Problems Tab -->
+            <div id="variation" class="tab-content">
+                <div class="card" style="margin-bottom: 2rem; border-color: var(--primary-color);">
+                    <h2 style="color: var(--primary-color);">AI 생성 변형 모의고사</h2>
+                    <p style="color: var(--text-scnd); margin-bottom: 1rem;">분석된 출제 경향을 바탕으로 생성된 1:1 맞춤형 변형 문제입니다.</p>
+                </div>
+
+                <div id="problems-container">
+                    <!-- Populated by JS -->
+                </div>
+
+                <div class="answer-key-section">
+                    <h2>정답 및 해설</h2>
+                    <div id="answers-container">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
